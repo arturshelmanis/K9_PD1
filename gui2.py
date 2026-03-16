@@ -84,7 +84,6 @@ def take_stones(n):
             get_winner()
             return
 
-       
 
 def computer_turn():
     current_node = Node(pl_stones.get(), pl_points.get(), table_stones.get(), comp_stones.get(), comp_points.get())
