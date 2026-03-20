@@ -1,7 +1,7 @@
 import tkinter as tk
 import time
 
-from game import Node, Tree, Game, Order
+from game import Node
 
 root = tk.Tk()
 root.geometry("900x700")
@@ -86,6 +86,7 @@ def take_stones(n):
 
 
 def computer_turn():
+    # sākam laika atskaiti TODO
     current_node = Node(pl_stones.get(), pl_points.get(), table_stones.get(), comp_stones.get(), comp_points.get())
     best_move = Node.getBestMove(current_node, algorithm.get())
 
@@ -94,6 +95,7 @@ def computer_turn():
         return    
 
     update_stats(best_move)
+    # beidzam laika atskaiti TODO
 
     # parbauda vai spēle beigusies, ja dators uzsāk spēli
     if table_stones.get() == 0 or table_stones.get() == 1:
@@ -119,7 +121,6 @@ def get_winner():
     else:
         text = "Neizšķirts!"
 
-    print(text)
     winner_label.config(text=text)
 
 

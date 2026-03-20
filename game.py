@@ -13,8 +13,10 @@ class Node:
         self.c_points = c_points # datora punktu skaits
         self.left = None
         self.right = None
+        self.generated_nodes = 0
 
     def add_children(self, order, n):
+        self.generated_nodes += 1
 
         # n šajā gadījumā ir, lai koks tiktu ģenerēts tikai līdz noteiktam dziļumam, tas tiek panākts ar rekursijas palīdzību
         if n == 0:
@@ -63,9 +65,6 @@ class Node:
         if self.right:
             self.right.add_children(Order((order.value + 1) % 2), n - 1)
 
-    def game_end(self):
-        return self.stones <= 1
-
     def computerWin(self):
         return (self.c_points + self.c_stones) > (self.p_points + self.p_stones)
 
@@ -73,8 +72,6 @@ class Node:
         # Šeit varat pamainīt heiristiskā novērtējuma funkciju un paspēlēties, kura ir labāka
         # Šobrīd heiristiskā funkcija f(n) = punktu starpība + 5(ja akmentiņu skaits ir pāra, citādi 0)
         return (self.c_points + self.c_stones) - (self.p_points + self.p_stones) + 5 * ((self.stones + 1) % 2)
-
-
 
     def minimax(node, isMaximizingPlayer):
         # if node.game_end():
@@ -104,12 +101,48 @@ class Node:
                 best_score = min(best_score, Node.minimax(node.right, True))
 
             return best_score
+
+    def alphabeta(node, alpha = float("-inf"), beta = float("inf"), isMaximizingPlayer = True):
+        # ja nav pēcteču tad aprēķinam heiristiskā novērtējuma funkciju
+        if (node.left == None and node.right == None):
+            return node.heuristicFunction(), node
+        
+        if isMaximizingPlayer:
+            best_score = float("-inf")
+            best_node = None
+
+            for child in [node.left, node.right]:
+                if child:
+                    score, _ = Node.alphabeta(child, alpha, beta, False)
+                    if (score > best_score):
+                        best_score = score
+                        best_node = child
+                    alpha = max(alpha, best_score)
+                    if beta <= alpha:
+                        break
+            return best_score, best_node
     
+        else:
+            best_score = float("inf")
+            best_node = None
+
+            for child in [node.left, node.right]:
+                if child:
+                    score, _ = Node.alphabeta(child, alpha, beta, True)
+                    if score < best_score:
+                        best_score = score
+                        best_node = child
+                    beta = min(beta, best_score)
+                    if beta <= alpha:
+                        break
+            return best_score, best_node
 
 
     def getBestMove(node, algorithm):
-        tree = Tree(node, Order.COMPUTER)
-        tree.generate_tree_to_n(2)
+        # šeit mums vajag rēķināt ģenērētās un novērtētās virsotnes
+        node.generate_tree_to_n(4)
+
+        print(node.generated_nodes)
 
         if (algorithm == "minimax"):
             left_score = Node.minimax(node.left, False) if node.left else float("-inf")
@@ -120,105 +153,8 @@ class Node:
             else:
                 return node.right
         elif (algorithm == "alphabeta"):
-            # alpha-beta algoritms nav implementēts
-            return 0
-
-
-class Tree:
-    def __init__(self, node, order):
-        self.root = node
-        self.order = order
+            best_move = Node.alphabeta(node, float("-inf"), float("inf"), True)[1]
+            return best_move
 
     def generate_tree_to_n(self, n):
-        self.root.add_children(self.order, n)
-
-    def print_tree(self, node=None, prefix="", is_left=True):
-        if node is None:
-            node = self.root
-
-        print(prefix + ("├─ " if is_left else "└─ ") +
-              f"Node(stones={node.stones}, p_stones={node.p_stones}, p_points={node.p_points}, "
-              f"c_stones={node.c_stones}, c_points={node.c_points})")
-
-        if node.left:
-            self.print_tree(node.left, prefix + ("│  " if is_left else "   "), True)
-        if node.right:
-            self.print_tree(node.right, prefix + ("│  " if is_left else "   "), False)
-
-
-class Game:
-    def __init__(self, node):
-        self.current_position = node
-
-    def make_move(self, node):
-        self.current_position = node
-
-
-def main():
-    total_stones = 50
-
-    node = Node(0, 0, total_stones, 0, 0)
-    # tree = Tree(node, 1)  # computer starts
-    # tree.generate_tree_to_n(20)
-
-    game = Game(node)
-
-    print(f"Welcome to the Stone Game! There are {total_stones} stones on the table.")
-    print("Computer will start now")
-
-    while not game.current_position.game_end():
-
-        print(f"\nStones left: {game.current_position.stones}")
-        print(f"Your stones: {game.current_position.p_stones}, Your points: {game.current_position.p_points}")
-        print(f"Computer stones: {game.current_position.c_stones}, Computer points: {game.current_position.c_points}")
-
-        # --- Computer move ---
-        best_move = Node.getBestMove(game.current_position)
-
-        if best_move is None:
-            print("Computer cannot move.")
-            break
-
-        taken = game.current_position.stones - best_move.stones
-        game.make_move(best_move)
-
-        print(f"Computer takes {taken} stones.")
-        
-        print(f"\nStones left: {game.current_position.stones}")
-        print(f"Your stones: {game.current_position.p_stones}, Your points: {game.current_position.p_points}")
-        print(f"Computer stones: {game.current_position.c_stones}, Computer points: {game.current_position.c_points}")
-
-        if game.current_position.game_end():
-            break
-
-        # --- Player move ---
-        while True:
-            try:
-                player_take = int(input("Pick 2 or 3 stones: "))
-                if player_take in [2, 3] and player_take <= game.current_position.stones:
-                    break
-                else:
-                    print("Invalid move.")
-            except ValueError:
-                print("Enter a number.")
-
-        if player_take == 2 and game.current_position.left:
-            game.make_move(game.current_position.left)
-        elif player_take == 3 and game.current_position.right:
-            game.make_move(game.current_position.right)
-        else:
-            print("Move not possible.")
-            break
-
-    print("\nGame Over!")
-
-    print(f"Your stones: {game.current_position.p_stones}, Your points: {game.current_position.p_points}")
-    print(f"Computer stones: {game.current_position.c_stones}, Computer points: {game.current_position.c_points}")
-
-    if game.current_position.computerWin():
-        print("Computer wins!")
-    else:
-        print("You win!")
-
-if (__name__ == "__main__"):
-    main()
+        self.add_children(Order.COMPUTER, n)
