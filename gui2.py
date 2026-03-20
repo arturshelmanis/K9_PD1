@@ -61,6 +61,8 @@ def reset_game():
     comp_taken_stones.set(0)
 
     winner_label.config(text="") # noņemam uzvarētāja izvadi
+    computer_time.set("") # noņemam laika izvadi
+    play_again_btn.place_forget() # noņemam play again poga izvadi
 
 
 def take_stones(n):
@@ -85,17 +87,25 @@ def take_stones(n):
             return
 
 
+
 def computer_turn():
-    # sākam laika atskaiti TODO
+    # sākam laika atskaiti
+    start = time.perf_counter()
+
     current_node = Node(pl_stones.get(), pl_points.get(), table_stones.get(), comp_stones.get(), comp_points.get())
     best_move = Node.getBestMove(current_node, algorithm.get())
 
     if best_move is None:
         print("Computer cannot move.")
-        return    
+        return
 
     update_stats(best_move)
-    # beidzam laika atskaiti TODO
+    # beidzam laika atskaiti
+    end = time.perf_counter()
+
+    computer_think_time = end - start
+
+    computer_time.set(f"Computer thinks time: {computer_think_time:.6f} s")
 
     # parbauda vai spēle beigusies, ja dators uzsāk spēli
     if table_stones.get() == 0 or table_stones.get() == 1:
@@ -106,8 +116,9 @@ def computer_turn():
     computer_taken_stones.grid()
     computer_taken_stones_value.grid()
 
-    root.after(1000, lambda:computer_taken_stones.grid_remove())
-    root.after(1000, lambda:computer_taken_stones_value.grid_remove())
+    #Varbut nevajag dzest viņus, lai vienmēr būtu info
+    #root.after(1000, lambda:computer_taken_stones.grid_remove())
+    #root.after(1000, lambda:computer_taken_stones_value.grid_remove())
 
 
 def get_winner():
@@ -122,7 +133,7 @@ def get_winner():
         text = "Neizšķirts!"
 
     winner_label.config(text=text)
-
+    play_again_btn.place(relx=0.0, rely=1.0, anchor="s", x=450, y=-10)
 
 def update_stats(node):
     table_stones.set(node.stones)
@@ -167,6 +178,8 @@ comp_points = tk.IntVar(value=0)
 
 comp_taken_stones = tk.IntVar(value=0)
 
+computer_time = tk.StringVar(value="Computer thinking time: 0.000000 s")
+
 title = tk.Label(stats_frame, text="Atlikušie akmentiņi:", font=("Arial", 16), bg="grey")
 title.grid(row=0, column=0, pady=10)
 
@@ -203,13 +216,16 @@ player_points_value.grid(row=5, column=0)
 computer_points_value = tk.Label(stats_frame, textvariable=comp_points, font=("Arial", 14), bg="grey")
 computer_points_value.grid(row=5, column=1)
 
-computer_taken_stones = tk.Label(stats_frame, text="Dators paņēma ", font=("Arial", 14), bg="grey")
+computer_taken_stones = tk.Label(stats_frame, text="Dators paņēma: ", font=("Arial", 14), bg="grey")
 computer_taken_stones.grid(row=6, column=0, pady=10)
-computer_taken_stones.grid_remove()
+#computer_taken_stones.grid_remove()
 
 computer_taken_stones_value = tk.Label(stats_frame, textvariable=comp_taken_stones, font=("Arial", 14), bg="grey")
 computer_taken_stones_value.grid(row=6, column=1)
-computer_taken_stones_value.grid_remove()
+#computer_taken_stones_value.grid_remove()
+
+computer_taken_stones = tk.Label(stats_frame, textvariable=computer_time, font=("Arial", 14), bg="grey")
+computer_taken_stones.grid(row=7, column=0, columnspan=2, pady=10)
 
 tk.Label(menu_frame, text="Izvēlieties kurš sāks spēli:", font=("Arial", 16), bg="grey").pack(pady=10)
 first_player = tk.StringVar(value="human")
@@ -248,6 +264,8 @@ approve_exit_btn = tk.Button(approve_frame, text="Yes",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=approve_exit)
 decline_exit_btn = tk.Button(approve_frame, text="No",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=decline_exit)
+play_again_btn = tk.Button(game_frame, text="Play again",bg="white",
+                                activebackground="black",activeforeground="black", width=15, height=4, command=start_game)
 
 approve_exit_btn.pack(pady=10)
 decline_exit_btn.pack(pady=10)
@@ -256,7 +274,7 @@ rules_btn.pack(pady=10)
 exit_btn.pack(pady=10)
 back_from_rules_btn.place(relx=0.0, rely=1.0, anchor="sw", x=10, y=-10)
 exit_from_game_btn.place(relx=0.0, rely=1.0, anchor="sw", x=10, y=-10)
-take_two_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=350, y=-300)
-take_three_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=550, y=-300)
+take_two_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=350, y=-250)
+take_three_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=550, y=-250)
 
 root.mainloop()
