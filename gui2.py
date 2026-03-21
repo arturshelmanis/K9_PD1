@@ -17,6 +17,7 @@ stats_frame = tk.Frame(game_frame, bg="grey")
 stats_frame.pack(pady=40)
 
 menu_frame.pack(fill="both", expand=True)
+move_times = [] # masīvs laika uzskaitei
 
 def start_game():
     reset_game()  # pārliecinamies, ka sāksies pilnīgi jauna spēle - restartējam spēli to sākot.
@@ -62,6 +63,8 @@ def reset_game():
 
     winner_label.config(text="") # noņemam uzvarētāja izvadi
     computer_time.set("") # noņemam laika izvadi
+    avg_time_var.set("") # noņemam vidējo laiku
+    move_times.clear()  
     play_again_btn.place_forget() # noņemam play again poga izvadi
 
 
@@ -134,6 +137,10 @@ def get_winner():
 
     winner_label.config(text=text)
     play_again_btn.place(relx=0.0, rely=1.0, anchor="s", x=450, y=-10)
+     if move_times:
+        avg_time = sum(move_times) / len(move_times)
+        avg_time_var.set(f"Vidējais datora gājiena laiks: {avg_time:.6f} s")
+        print(f"Vidējais datora gājiena laiks: {avg_time:.6f} s")
 
 def update_stats(node):
     table_stones.set(node.stones)
@@ -226,6 +233,9 @@ computer_taken_stones_value.grid(row=6, column=1)
 
 computer_taken_stones = tk.Label(stats_frame, textvariable=computer_time, font=("Arial", 14), bg="grey")
 computer_taken_stones.grid(row=7, column=0, columnspan=2, pady=10)
+
+avg_time_var = tk.StringVar(value="Vidējais laiks: 0.000000 s")
+tk.Label(stats_frame, textvariable=avg_time_var, font=("Arial", 14), bg="grey").grid(row=8, column=0, columnspan=2)
 
 tk.Label(menu_frame, text="Izvēlieties kurš sāks spēli:", font=("Arial", 16), bg="grey").pack(pady=10)
 first_player = tk.StringVar(value="human")
