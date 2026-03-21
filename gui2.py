@@ -137,7 +137,7 @@ def get_winner():
 
     winner_label.config(text=text)
     play_again_btn.place(relx=0.0, rely=1.0, anchor="s", x=450, y=-10)
-     if move_times:
+    if move_times:
         avg_time = sum(move_times) / len(move_times)
         avg_time_var.set(f"Vidējais datora gājiena laiks: {avg_time:.6f} s")
         print(f"Vidējais datora gājiena laiks: {avg_time:.6f} s")
