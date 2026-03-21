@@ -5,6 +5,10 @@ class Order(Enum):
     COMPUTER = 1
 
 class Node:
+    # klases mainīgie, kuriem var piekļūt šajā klasē, jebkurā instancē un visās instancēs vērtība ir vienāda
+    generated_nodes_count = 0
+    evaluated_nodes_count = 0
+
     def __init__(self, p_stones, p_points, stones, c_stones, c_points):
         self.p_stones = p_stones # spēlētāja akmentiņu skaits
         self.p_points = p_points # spēlētāja punktu skaits
@@ -13,10 +17,10 @@ class Node:
         self.c_points = c_points # datora punktu skaits
         self.left = None
         self.right = None
-        self.generated_nodes = 0
+        self.alphabeta_value = None
 
     def add_children(self, order, n):
-        self.generated_nodes += 1
+        Node.generated_nodes_count += 1
 
         # n šajā gadījumā ir, lai koks tiktu ģenerēts tikai līdz noteiktam dziļumam, tas tiek panākts ar rekursijas palīdzību
         if n == 0:
@@ -74,8 +78,7 @@ class Node:
         return (self.c_points + self.c_stones) - (self.p_points + self.p_stones) + 5 * ((self.stones + 1) % 2)
 
     def minimax(node, isMaximizingPlayer):
-        # if node.game_end():
-        #     return 1 if node.computerWin() else -1
+        Node.evaluated_nodes_count += 1
 
         # ja nav pēcteču tad aprēķinam heiristiskā novērtējuma funkciju
         if (node.left == None and node.right == None):
@@ -102,7 +105,8 @@ class Node:
 
             return best_score
 
-    def alphabeta(node, alpha = float("-inf"), beta = float("inf"), isMaximizingPlayer = True):
+    def alphabeta(node, parent_node = None, isMaximizingPlayer = True):
+        Node.evaluated_nodes_count += 1
         # ja nav pēcteču tad aprēķinam heiristiskā novērtējuma funkciju
         if (node.left == None and node.right == None):
             return node.heuristicFunction(), node
@@ -113,12 +117,12 @@ class Node:
 
             for child in [node.left, node.right]:
                 if child:
-                    score, _ = Node.alphabeta(child, alpha, beta, False)
+                    score, _ = Node.alphabeta(child, node, False)
                     if (score > best_score):
                         best_score = score
                         best_node = child
-                    alpha = max(alpha, best_score)
-                    if beta <= alpha:
+                    node.alphabeta_value = max(node.alphabeta_value, best_score) if node.alphabeta_value is not None else best_score
+                    if parent_node is not None and parent_node.alphabeta_value is not None and parent_node.alphabeta_value <= node.alphabeta_value:
                         break
             return best_score, best_node
     
@@ -128,33 +132,34 @@ class Node:
 
             for child in [node.left, node.right]:
                 if child:
-                    score, _ = Node.alphabeta(child, alpha, beta, True)
+                    score, _ = Node.alphabeta(child, node, True)
                     if score < best_score:
                         best_score = score
                         best_node = child
-                    beta = min(beta, best_score)
-                    if beta <= alpha:
+                    node.alphabeta_value = min(node.alphabeta_value, best_score) if node.alphabeta_value is not None else best_score
+                    if parent_node is not None and parent_node.alphabeta_value is not None and parent_node.alphabeta_value >= node.alphabeta_value and child is node.left:
                         break
             return best_score, best_node
 
 
     def getBestMove(node, algorithm):
         # šeit mums vajag rēķināt ģenērētās un novērtētās virsotnes
-        node.generate_tree_to_n(4)
-
-        print(node.generated_nodes)
+        node.generate_tree_to_n(5)
 
         if (algorithm == "minimax"):
             left_score = Node.minimax(node.left, False) if node.left else float("-inf")
             right_score = Node.minimax(node.right, False) if node.right else float("-inf")
+            Node.evaluated_nodes_count += 1 
 
             if left_score > right_score:
-                return node.left
+                return node.left       
             else:
                 return node.right
         elif (algorithm == "alphabeta"):
-            best_move = Node.alphabeta(node, float("-inf"), float("inf"), True)[1]
+            best_move = Node.alphabeta(node,None, True)[1]
             return best_move
 
     def generate_tree_to_n(self, n):
+        Node.evaluated_nodes_count = 0
+        Node.generated_nodes_count = 0
         self.add_children(Order.COMPUTER, n)

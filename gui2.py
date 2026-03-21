@@ -18,6 +18,8 @@ stats_frame.pack(pady=40)
 
 menu_frame.pack(fill="both", expand=True)
 move_times = [] # masīvs laika uzskaitei
+generated_nodes = []
+evaluated_nodes = []
 
 def start_game():
     reset_game()  # pārliecinamies, ka sāksies pilnīgi jauna spēle - restartējam spēli to sākot.
@@ -64,7 +66,11 @@ def reset_game():
     winner_label.config(text="") # noņemam uzvarētāja izvadi
     computer_time.set("") # noņemam laika izvadi
     avg_time_var.set("") # noņemam vidējo laiku
+    avg_gen_nodes.set("") # noņemam vidējo ģenerēto virsotņu skaitu
+    avg_eval_nodes.set("") # noņemam vidējo novērtēto virsotņu skaitu
     move_times.clear()  
+    generated_nodes.clear()
+    evaluated_nodes.clear()
     play_again_btn.place_forget() # noņemam play again poga izvadi
 
 
@@ -110,18 +116,16 @@ def computer_turn():
     move_times.append(computer_think_time)
     computer_time.set(f"Computer thinks time: {computer_think_time:.6f} s")
 
+    # pievieno ģenerēto un novērtēto virsotņu skaitu
+    generated_nodes.append(Node.generated_nodes_count)
+    evaluated_nodes.append(Node.evaluated_nodes_count)
+
     # parbauda vai spēle beigusies, ja dators uzsāk spēli
     if table_stones.get() == 0 or table_stones.get() == 1:
         get_winner()
         return
     comp_taken_stones.set(current_node.stones - best_move.stones)
 
-    computer_taken_stones.grid()
-    computer_taken_stones_value.grid()
-
-    #Varbut nevajag dzest viņus, lai vienmēr būtu info
-    #root.after(1000, lambda:computer_taken_stones.grid_remove())
-    #root.after(1000, lambda:computer_taken_stones_value.grid_remove())
 
 
 def get_winner():
@@ -141,6 +145,13 @@ def get_winner():
         avg_time = sum(move_times) / len(move_times)
         avg_time_var.set(f"Vidējais datora gājiena laiks: {avg_time:.6f} s")
         print(f"Vidējais datora gājiena laiks: {avg_time:.6f} s")
+    if generated_nodes and evaluated_nodes:
+        avg_gen = sum(generated_nodes) / len(generated_nodes)
+        avg_eval = sum(evaluated_nodes) / len(evaluated_nodes)
+        avg_gen_nodes.set(f"Vidējais ģenerēto virsotņu skaits: {avg_gen:.2f}")
+        avg_eval_nodes.set(f"Vidējais novērtēto virsotņu skaits: {avg_eval:.2f}")
+        print(f"Vidējais ģenerēto virsotņu skaits: {avg_gen:.2f}")
+        print(f"Vidējais novērtēto virsotņu skaits: {avg_eval:.2f}")
 
 def update_stats(node):
     table_stones.set(node.stones)
@@ -225,17 +236,20 @@ computer_points_value.grid(row=5, column=1)
 
 computer_taken_stones = tk.Label(stats_frame, text="Dators paņēma: ", font=("Arial", 14), bg="grey")
 computer_taken_stones.grid(row=6, column=0, pady=10)
-#computer_taken_stones.grid_remove()
 
 computer_taken_stones_value = tk.Label(stats_frame, textvariable=comp_taken_stones, font=("Arial", 14), bg="grey")
 computer_taken_stones_value.grid(row=6, column=1)
-#computer_taken_stones_value.grid_remove()
 
 computer_taken_stones = tk.Label(stats_frame, textvariable=computer_time, font=("Arial", 14), bg="grey")
 computer_taken_stones.grid(row=7, column=0, columnspan=2, pady=10)
 
 avg_time_var = tk.StringVar(value="Vidējais laiks: 0.000000 s")
 tk.Label(stats_frame, textvariable=avg_time_var, font=("Arial", 14), bg="grey").grid(row=8, column=0, columnspan=2)
+
+avg_gen_nodes = tk.StringVar(value="Vidējais ģenerēto virsotņu skaits: 0.00")
+avg_eval_nodes = tk.StringVar(value="Vidējais novērtēto virsotņu skaits: 0.00")
+tk.Label(stats_frame, textvariable=avg_gen_nodes, font=("Arial", 14), bg="grey").grid(row=9, column=0, columnspan=2)
+tk.Label(stats_frame, textvariable=avg_eval_nodes, font=("Arial", 14), bg="grey").grid(row=10, column=0, columnspan=2)
 
 tk.Label(menu_frame, text="Izvēlieties kurš sāks spēli:", font=("Arial", 16), bg="grey").pack(pady=10)
 first_player = tk.StringVar(value="human")
@@ -284,7 +298,7 @@ rules_btn.pack(pady=10)
 exit_btn.pack(pady=10)
 back_from_rules_btn.place(relx=0.0, rely=1.0, anchor="sw", x=10, y=-10)
 exit_from_game_btn.place(relx=0.0, rely=1.0, anchor="sw", x=10, y=-10)
-take_two_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=350, y=-250)
-take_three_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=550, y=-250)
+take_two_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=350, y=-200)
+take_three_game_btn.place(relx=0.0, rely=1.0, anchor="s", x=550, y=-200)
 
 root.mainloop()
