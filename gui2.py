@@ -107,7 +107,7 @@ def computer_turn():
     end = time.perf_counter()
 
     computer_think_time = end - start
-
+    move_times.append(computer_think_time)
     computer_time.set(f"Computer thinks time: {computer_think_time:.6f} s")
 
     # parbauda vai spēle beigusies, ja dators uzsāk spēli
