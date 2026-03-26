@@ -120,11 +120,12 @@ def computer_turn():
     generated_nodes.append(Node.generated_nodes_count)
     evaluated_nodes.append(Node.evaluated_nodes_count)
 
+    comp_taken_stones.set(current_node.stones - best_move.stones)
     # parbauda vai spēle beigusies, ja dators uzsāk spēli
     if table_stones.get() == 0 or table_stones.get() == 1:
         get_winner()
         return
-    comp_taken_stones.set(current_node.stones - best_move.stones)
+    
 
 
 

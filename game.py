@@ -84,7 +84,6 @@ class Node:
         if (node.left == None and node.right == None):
             return node.heuristicFunction()
 
-
         if isMaximizingPlayer:
             best_score = float("-inf")
 
@@ -122,7 +121,7 @@ class Node:
                         best_score = score
                         best_node = child
                     node.alphabeta_value = max(node.alphabeta_value, best_score) if node.alphabeta_value is not None else best_score
-                    if parent_node is not None and parent_node.alphabeta_value is not None and parent_node.alphabeta_value <= node.alphabeta_value:
+                    if parent_node is not None and parent_node.alphabeta_value is not None and parent_node.alphabeta_value <= node.alphabeta_value and child is node.left:
                         break
             return best_score, best_node
     
