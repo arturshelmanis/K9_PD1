@@ -5,7 +5,7 @@ from game import Node
 
 root = tk.Tk()
 root.geometry("900x700")
-root.title("Stone game")
+root.title("Akmentiņu spēle")
 root.resizable(width=False, height=False)
 
 menu_frame = tk.Frame(root, bg="grey")
@@ -105,7 +105,7 @@ def computer_turn():
     best_move = Node.getBestMove(current_node, algorithm.get())
 
     if best_move is None:
-        print("Computer cannot move.")
+        print("Dators nespēj kustēties.")
         return
 
     update_stats(best_move)
@@ -114,7 +114,7 @@ def computer_turn():
 
     computer_think_time = end - start
     move_times.append(computer_think_time)
-    computer_time.set(f"Computer thinks time: {computer_think_time:.6f} s")
+    computer_time.set(f"Datora domāšanas laiks: {computer_think_time:.6f} s")
 
     # pievieno ģenerēto un novērtēto virsotņu skaitu
     generated_nodes.append(Node.generated_nodes_count)
@@ -180,7 +180,7 @@ Ja spēlētāju punktu skaits ir vienāds, tad rezultāts ir neizšķirts.
 Pretējā gadījumā uzvar spēlētājs, kam ir vairāk punktu.
 """
 
-tk.Label(menu_frame, text="Main menu", font=("Arial", 18), bg="grey").pack(pady=5)
+tk.Label(menu_frame, text="Galvenā izvēlne", font=("Arial", 18), bg="grey").pack(pady=5)
 
 tk.Label(menu_frame, text="Sākuma akmentiņu skaits (50–70)", font=("Arial", 16), bg="grey").pack(pady=10)
 stones_entry = tk.Spinbox(menu_frame, from_=50, to=70, font=("Arial", 14), width=8)
@@ -196,7 +196,7 @@ comp_points = tk.IntVar(value=0)
 
 comp_taken_stones = tk.IntVar(value=0)
 
-computer_time = tk.StringVar(value="Computer thinking time: 0.000000 s")
+computer_time = tk.StringVar(value="Datora domāšanas laiks: 0.000000 s")
 
 title = tk.Label(stats_frame, text="Atlikušie akmentiņi:", font=("Arial", 16), bg="grey")
 title.grid(row=0, column=0, pady=10)
@@ -258,37 +258,37 @@ tk.Radiobutton(menu_frame, text="Dators", bg="grey", font=("Arial", 14), variabl
 
 tk.Label(menu_frame, text="Izvēlieties spēles algoritmu:", font=("Arial", 16), bg="grey").pack(pady=10)
 algorithm = tk.StringVar(value="minimax")
-tk.Radiobutton(menu_frame, text="Minimax", bg="grey", font=("Arial", 14), variable=algorithm, value="minimax").pack()
-tk.Radiobutton(menu_frame, text="Alpha-Beta", bg="grey", font=("Arial", 14), variable=algorithm,
+tk.Radiobutton(menu_frame, text="Minimaksa", bg="grey", font=("Arial", 14), variable=algorithm, value="minimax").pack()
+tk.Radiobutton(menu_frame, text="Alfa-Beta", bg="grey", font=("Arial", 14), variable=algorithm,
                value="alphabeta").pack()
 
 tk.Label(rules_frame, text=rules_text, font=("Arial", 16), wraplength=500, justify="center", bg="grey").pack(pady=20)
-tk.Label(approve_frame, text="You really want to exit", font=("Arial", 16), wraplength=500, justify="center", bg="grey").pack(pady=20)
+tk.Label(approve_frame, text="Vai tiešām vēlaties iziet?", font=("Arial", 16), wraplength=500, justify="center", bg="grey").pack(pady=20)
 
 # izvades vieta uzvarētāja tekstam - formatējusm ārpus klases get_winnner, lai tekstu var noņemt, kad sākas jauna spēle
 winner_label = tk.Label(game_frame, text="", font=("Arial", 16), bg="grey")
 winner_label.place(relx=0.5, rely=1.0, anchor="s", y=-100)
 
 
-exit_btn = tk.Button(menu_frame, text="Exit",bg="white",
+exit_btn = tk.Button(menu_frame, text="Iziet",bg="white",
                      activebackground="black",activeforeground="black", width=15, height=4, command=root.destroy)
-game_btn = tk.Button(menu_frame, text="Start game",bg="white",
+game_btn = tk.Button(menu_frame, text="Sākt spēli",bg="white",
                      activebackground="black",activeforeground="black", width=15, height=4, command=start_game)
-rules_btn = tk.Button(menu_frame, text="Game rules",bg="white",
+rules_btn = tk.Button(menu_frame, text="Spēles noteikumi",bg="white",
                       activebackground="black",activeforeground="black", width=15, height=4, command=game_rules)
-back_from_rules_btn = tk.Button(rules_frame, text="Back",bg="white",
+back_from_rules_btn = tk.Button(rules_frame, text="Atpakaļ",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=back_from_rules)
-exit_from_game_btn = tk.Button(game_frame, text="Exit",bg="white",
+exit_from_game_btn = tk.Button(game_frame, text="Iziet",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=back_from_game)
-take_two_game_btn = tk.Button(game_frame, text="Take 2 stones",bg="white",
+take_two_game_btn = tk.Button(game_frame, text="Ņem 2 akmentiņus",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command= lambda:take_stones(2))
-take_three_game_btn = tk.Button(game_frame, text="Take 3 stones",bg="white",
+take_three_game_btn = tk.Button(game_frame, text="Ņem 3 akmentiņus",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command= lambda:take_stones(3))
-approve_exit_btn = tk.Button(approve_frame, text="Yes",bg="white",
+approve_exit_btn = tk.Button(approve_frame, text="Jā",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=approve_exit)
-decline_exit_btn = tk.Button(approve_frame, text="No",bg="white",
+decline_exit_btn = tk.Button(approve_frame, text="Nē",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=decline_exit)
-play_again_btn = tk.Button(game_frame, text="Play again",bg="white",
+play_again_btn = tk.Button(game_frame, text="Spēlēt atkal",bg="white",
                                 activebackground="black",activeforeground="black", width=15, height=4, command=start_game)
 
 approve_exit_btn.pack(pady=10)
